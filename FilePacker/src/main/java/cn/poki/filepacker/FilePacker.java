@@ -3,6 +3,7 @@ package cn.poki.filepacker;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.*;
+import java.util.LinkedList;
 import java.util.List;
 
 public class FilePacker {
@@ -25,24 +26,60 @@ public class FilePacker {
          */
         private List<FileBlock> fileBlocks;
 
+        /**
+         * 一个文件中的某段数据
+         */
         class FileBlock{
-            //todo answer11: 怎么表示“不同文件的不同位置的数据”？
+            /**
+             * 对应的文件
+             */
+            private File file;
+
+            /**
+             * 数据起始位置
+             */
+            private Long start;
+
+            /**
+             * 数据长度
+             */
+            private Long length;
+        }
+
+        /**将数据块写到数据文件
+         * @param outputFile
+         */
+        public void saveToFile(File outputFile){
+            //todo answer14: 按什么顺序写，写什么，
+            throw new NotImplementedException();
+        }
+
+        /**从数据文件读取数据块
+         */
+        public void loadFromFile(File inputFile){
+            //todo answer15: 按什么顺序读，读什么，
+            throw new NotImplementedException();
         }
     }
 
     // 下面两个函数就是递归的时候分割文件和文件夹的（意义上）
     private void  analyzeFile(File filepath){
+        //todo answer13: 这个函数就是给 packInfos 增加元素的，
+        // 考虑一下什么情况下需要增加一个元素，什么情况下只需补充信息即可？
         throw new NotImplementedException();
     }
+
 
     private void analyzeFolder(File dirPath){
+        // todo [task]-1:遍历目录，递归调用它本身和analyzeFile
         throw new NotImplementedException();
     }
 
+    private List<PackInfo> packInfos=new LinkedList<PackInfo>();
+
     private List<PackInfo> analyzeDir(File path){
-        //这个函数就是生成一系列packinfo对象
-        //todo answer12： 怎么生成？写伪代码
-        throw new NotImplementedException();
+        analyzeFolder(path);
+        return packInfos;
     }
 
 
