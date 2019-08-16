@@ -11,22 +11,19 @@ public class FilePacker {
     private static void splitFile(File f, Long eachSize) throws IOException {
         if(f.length()>BLOCKSIZE) {
             int count = (int)(Math.ceil(f.length() / eachSize))+1;//块数
-            try {
-                InputStream inf = new FileInputStream(f);
-                int no = f.getName().lastIndexOf(".");
-                String str = f.getParent()+"\\"+f.getName().substring(0, no );/**目录路径*/
-                createOutputDir(str);
-                packageBlockFiles(f, count, inf, no, str);
-                inf.close();
-            } catch(Exception ine) {
-                throw ine;
-            }
+            InputStream inf = new FileInputStream(f);
+
+            String subpath = f.getName().substring(0, f.getName().lastIndexOf("."));
+            String str = f.getParent()+"\\"+subpath;/**目录路径*/
+            createOutputDir(str);
+            packageBlockFiles(f, count, inf, subpath, str);
+            inf.close();
         }else{
             throw new NotImplementedException();
         }
     }
 
-    private static void packageBlockFiles(File f, int count, InputStream inf, int no, String str) throws IOException {
+    private static void packageBlockFiles(File f, int count, InputStream inf,String subpath, String str) throws IOException {
         OutputStream[] outf = new FileOutputStream[count];
         /**创建各小块文件并命名*/
         File[] dir_f = new File[count];
@@ -34,7 +31,7 @@ public class FilePacker {
         String fName = f.getName();
         String fPattern = fName.substring(fName.lastIndexOf("."), fName.length());
         for(int j=0; j<count; j++) {
-            String newPath = str+"\\"+f.getName().substring(0, no)+"-"+j+fPattern;
+            String newPath = str+"\\"+subpath+"-"+j+fPattern;
             dir_f[j] = new File(newPath);
             outf[j] = new FileOutputStream(dir_f[j]);
         }
@@ -72,6 +69,7 @@ public class FilePacker {
     public static void divide( String fPath ) throws Exception {
         File f = new File(fPath);
         if(f.exists()){
+
             if(f.isFile() && f.length() > BLOCKSIZE) {
                 splitFile(f, BLOCKSIZE);
             }
@@ -83,10 +81,14 @@ public class FilePacker {
                             splitFile(dir[i], BLOCKSIZE);
                         }
                         else if(dir[i].isDirectory() && dir[i].length() > BLOCKSIZE) {
+                            // todo answer8:  很显然这里传进去的路径**存在**且是**目录** ，而divide函数里面有判断，这样的函数应该是同一个吗？
                             divide(dir[i].getAbsolutePath());
                         }
                     }
                 }
+            }else{
+                // todo answer7: 小于10m的被喵喵吃了吗？
+                throw new NotImplementedException();
             }
         }
         else {
@@ -94,67 +96,17 @@ public class FilePacker {
         }
     }
 
-
-    private static void murgeFile(File dir, File dst) throws IOException {
-
-        String[] children;
-
-        //todo answer:4 这个过滤器有什么用....，都是返回true
-//        FilenameFilter filter = new FilenameFilter(){
-//            public boolean accept(File dir, String name) {
-//                return true;
-//            }
-//        };
-
-        File filePath = new File(BASEPATH+"\\作业要求");//需要拼装的目录
-        String fileIndex="0";
-        File bigFile = new File(filePath + "\\" + "Files"+"_"+fileIndex);
-        BufferedOutputStream out=new BufferedOutputStream(new FileOutputStream(bigFile));
-        int buffsize=1024;
-
-        children = dir.list();
-
-        for (int i = 0; i < children.length; i++) {
-
-            FileInputStream in = new FileInputStream(dir + "\\" + children[i]);
-            byte[] buffer = new byte[buffsize];
-
-            int len=0;
-            //todo answer5 : 不应该是判断输入文件大小吗？
-            if (bigFile.length()<BLOCKSIZE) {
-
-                while ((len = in.read(buffer)) > 0) {
-                    out.write(buffer, 0, len);
-                }
-                out.flush();
-            } else {
-                int fileIndexInt = Integer.parseInt(fileIndex) + 1;
-                bigFile = new File(filePath + "/" + "Files" + "_"
-                        + fileIndexInt);
-                out = new BufferedOutputStream(
-                        new FileOutputStream(bigFile));
-
-                while ((len = in.read(buffer)) > 0) {
-                    out.write(buffer, 0, len);
-                }
-                out.flush();
-                fileIndex = String.valueOf(fileIndexInt);
-            }
-        }
-        out.close();
+    /** 打包文件夹
+     * todo answer6:为什么要有这个函数，直接调用divide不好吗？
+     * @param path
+     * @throws Exception
+     */
+    private static void packageDir(String path) throws Exception {
+        divide(path);
     }
 
     public static void start() throws Exception {
-
-        divide(BASEPATH);
-        File dir = new File(BASEPATH+"\\作业要求");
-        File out=new File(BASEPATH+"\\作业要求");
-        try {
-            murgeFile(dir,out);
-            //由于是在网上找的方法，东拼西凑改的，合并这个地方还不够灵活，应该要再创建一个方法遍历原目录所有文件进行合并处理，遇到子文件夹再将子文件也拼接（待完成）
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        packageDir(BASEPATH);
     }
 
     public static void main(String[] args) throws Exception {
