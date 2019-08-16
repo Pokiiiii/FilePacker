@@ -1,4 +1,4 @@
-package FilePacker;
+package cn.poki.filepacker;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -12,7 +12,6 @@ public class FilePacker {
         if(f.length()>BLOCKSIZE) {
             int count = (int)(Math.ceil(f.length() / eachSize))+1;//块数
             InputStream inf = new FileInputStream(f);
-
             String subpath = f.getName().substring(0, f.getName().lastIndexOf("."));
             String str = f.getParent()+"\\"+subpath;/**目录路径*/
             createOutputDir(str);
