@@ -1,11 +1,14 @@
 package FilePacker;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import java.io.*;
 
 public class FilePacker {
     public static final Long BLOCKSIZE=10 * 1024 * 1024L;//10MB
     public static final String BASEPATH="c:\\Users\\73426\\Desktop\\PPT\\test";
-    private static void splitFile(File f, Long eachSize) {
+
+    private static void splitFile(File f, Long eachSize) throws IOException {
         if(f.length()>BLOCKSIZE) {
             int count = (int)(Math.ceil(f.length() / eachSize))+1;//块数
             try {
@@ -49,21 +52,19 @@ public class FilePacker {
                     }
                 }
                 inf.close();
-                f.delete();
+                //todo answer1:
+                // f.delete(); ??? 谁能告诉我为什么要把源文件删了
+            } catch(Exception ine) {
+                //todo answer2: 想清楚异常要怎么处理
+                throw ine;
             }
-            catch(IOException ioe) {
-                System.out.println("IO 异常");
-            }
-            catch(IndexOutOfBoundsException ine) {
-                System.out.println("数组越界 异常");
-            }
-            catch(Exception e) {
-                System.out.println("异常");
-            }
+        }else{
+            // todo answer3: 小于10m的,你的if分支要处理啊，不能直接忽略..
+            throw new NotImplementedException();
         }
     }
 
-    public static void divide( String fPath ) {
+    public static void divide( String fPath ) throws Exception {
         File f = new File(fPath);
         if(f.exists()){
             if(f.isFile() && f.length() > BLOCKSIZE) {
@@ -71,7 +72,6 @@ public class FilePacker {
             }
             else if(f.isDirectory() && f.length() > BLOCKSIZE) {
                 File[] dir = f.listFiles();
-
                 for(int i=0; i<dir.length; i++) {
                     if(dir[i].exists() && dir[i].length() > BLOCKSIZE){
                         if(dir[i].isFile()) {
@@ -85,7 +85,7 @@ public class FilePacker {
             }
         }
         else {
-            System.out.println(fPath + "  不存在文件！");
+            throw new Exception("文件不存在"+fPath);
         }
     }
 
@@ -131,8 +131,8 @@ public class FilePacker {
         out.close();
     }
 
-    public static void start()
-    {
+    public static void start() throws Exception {
+
         divide(BASEPATH);//切割
         File dir = new File(BASEPATH+"\\作业要求");
         File out=new File(BASEPATH+"\\作业要求");
@@ -144,7 +144,7 @@ public class FilePacker {
         }
     }
 
-    public static void main(String[] args)throws IOException {
+    public static void main(String[] args) throws Exception {
         start();
     }
 }
