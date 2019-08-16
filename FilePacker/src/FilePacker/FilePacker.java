@@ -6,10 +6,9 @@ import javax.security.auth.DestroyFailedException;
 
 public class FilePacker {
     private static void splitFile(File f, int eachSize) {
-        if(f.length()>10 * 1024 * 1024) {//该文件大于10m
+        if(f.length()>10 * 1024 * 1024) {
             int count = (int)(Math.ceil(f.length() / eachSize))+1;//块数
             try {
-                /**创建输入输出流对象*/
                 InputStream inf = new FileInputStream(f);
                 OutputStream[] outf = new FileOutputStream[count];
                 /**创建文件夹，存储各小块文件*/
@@ -66,16 +65,11 @@ public class FilePacker {
 
     public static void divide( String fPath ) {
         File f = new File(fPath);
-        /**文件存在*/
         if(f.exists()){
-            /**是单个文件*/
             if(f.isFile() && f.length() > 10*1024*1024) {
-                /**调用单文件分割方法*/
                 splitFile(f, 10*1024*1024);
             }
-            /**是目录*/
             else if(f.isDirectory() && f.length() > 10*1024*1024) {
-                /**目录文件数组化*/
                 File[] dir = f.listFiles();
 
                 for(int i=0; i<dir.length; i++) {
@@ -118,7 +112,7 @@ public class FilePacker {
                 while ((len = in.read(buffer)) > 0) {
                     out.write(buffer, 0, len);
                 }
-                out.flush();// out.close();
+                out.flush();
             } else {
                 int fileIndexInt = Integer.parseInt(fileIndex) + 1;
                 FileBig = new File(filePath + "/" + "Files" + "_"
@@ -130,7 +124,6 @@ public class FilePacker {
                     out.write(buffer, 0, len);
                 }
                 out.flush();
-//out.close();
                 fileIndex = String.valueOf(fileIndexInt);
             }
         }
